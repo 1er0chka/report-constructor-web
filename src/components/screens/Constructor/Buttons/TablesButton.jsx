@@ -1,7 +1,7 @@
 import React, {useState} from "react";
 import style from "./Buttons.module.css";
 
-const TableButton = ({tableNames}) => {
+const TableButton = ({tableNames, getTableColumns}) => {
     const [isOpen, setIsOpen] = useState(false);
     const [selectedTable, setSelectedTable] = useState('Не выбрано');
 
@@ -9,21 +9,10 @@ const TableButton = ({tableNames}) => {
         setIsOpen(!isOpen);
     }
 
-
     const selectTable = (tableName) => {
         setSelectedTable(tableName);
         toggleDropdown();
-        fetch(`http://localhost:2006/report-create/${tableName}`)
-            .then((response) => response.json())
-            .then((data) => {
-                // Обработка успешного ответа
-                console.log("GET запрос выполнен успешно");
-                console.log("Ответ сервера:", data);
-            })
-            .catch((error) => {
-                // Обработка ошибки
-                console.error("Ошибка при выполнении GET запроса:", error);
-            });
+        getTableColumns(tableName);
     }
 
     return (

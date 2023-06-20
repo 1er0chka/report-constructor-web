@@ -5,6 +5,7 @@ import ColumnsButton from "./Buttons/ColumnsButton";
 
 const Constructor = () => {
     const [tableNames, setTableNames] = useState([]);
+    const [tableColumns, setTableColumns] = useState([]);
 
     useEffect(() => {
         getTableNames();
@@ -19,7 +20,19 @@ const Constructor = () => {
                 setTableNames(data.tables);
             })
             .catch((error) => {
-                // Обработка ошибки
+                console.error("Error occurred during GET request:", error);
+            });
+    }
+
+    function getTableColumns(tableName) {
+        fetch(`http://localhost:2006/report-create/${tableName}`)
+            .then((response) => response.json())
+            .then((data) => {
+                console.log("GET request completed successfully");
+                console.log("Server response:", data);
+                setTableColumns(data.columns);
+            })
+            .catch((error) => {
                 console.error("Error occurred during GET request:", error);
             });
     }
@@ -41,7 +54,7 @@ const Constructor = () => {
                             Выберите таблицу
                         </div>
                         <div>
-                            <TableButton tableNames={tableNames}/>
+                            <TableButton tableNames={tableNames} getTableColumns={getTableColumns}/>
                         </div>
                     </div>
                     <div>
@@ -49,7 +62,7 @@ const Constructor = () => {
                             Выберите поле
                         </div>
                         <div>
-                            <ColumnsButton/>
+                            <ColumnsButton tableColumns={tableColumns}/>
                         </div>
                     </div>
                     <div className={style.text}>
