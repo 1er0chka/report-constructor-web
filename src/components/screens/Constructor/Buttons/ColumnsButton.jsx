@@ -1,7 +1,7 @@
 import React, {useState} from "react";
 import style from "./Buttons.module.css";
 
-const ColumnsButton = ({tableColumns}) => {
+const ColumnsButton = ({tableColumns, isColumnsRelevant, setColumnsRelevant, activateAddButton}) => {
     const [isOpen, setIsOpen] = useState(false);
     const [selectedColumn, setSelectedColumn] = useState('Не выбрано');
 
@@ -10,17 +10,19 @@ const ColumnsButton = ({tableColumns}) => {
     }
 
     const selectColumn = (columnName) => {
+        setColumnsRelevant(true);
         setSelectedColumn(columnName);
         toggleDropdown();
+        activateAddButton(columnName);
     }
 
     return (
         <div className={style.dropdown}>
-            <button className={style.dropdownToggle}>{selectedColumn || 'Не выбрано'}</button>
+            <button className={style.dropdownToggle}>{isColumnsRelevant ? selectedColumn : 'Не выбрано'}</button>
             <ul className={style.dropdownMenu}>
-                {tableColumns.map((columnName, index) => (
-                    <li key={index} onClick={() => selectColumn(columnName)}>
-                        {columnName}
+                {Object.keys(tableColumns).map((key, index) => (
+                    <li key={index} onClick={() => selectColumn(key)}>
+                        {key}
                     </li>
                 ))}
             </ul>

@@ -1,0 +1,22 @@
+.container {
+}
+
+.button {
+    float: right;
+    width: 310px;
+    margin-top: 28px;
+    height: 36px;
+    padding: 8px 16px;
+    font-size: 16px;
+    border: none;
+    background-color: #ff9601;
+    box-shadow: 0 4px 4px 0 rgba(255, 150, 1, .2);
+    color: #fff;
+    transition: box-shadow 0.3s ease; /* Продолжительность анимации 0.3 секунды с плавной функцией ускорения (ease) */
+
+}
+
+.button:hover {
+    box-shadow: 0 4px 4px 0 rgba(255, 150, 1, .4);
+    cursor: pointer;
+}
