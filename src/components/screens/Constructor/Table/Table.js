@@ -1,11 +1,10 @@
 import React from "react";
 import style from "./Table.module.css";
 import ExportButton from "./ExportButton";
-import { DownloadTableExcel } from 'react-export-table-to-excel';
 
 const Table = ({ columnsWithRows, exportToExcel}) => {
     if (Object.keys(columnsWithRows).length === 0) {
-        return null; // Если объект пуст, не отображаем таблицу
+        return null;
     }
 
     const columns = Object.keys(columnsWithRows);
@@ -27,7 +26,7 @@ const Table = ({ columnsWithRows, exportToExcel}) => {
                     <tr key={rowIndex}>
                         {columns.map((column, columnIndex) => (
                             <td key={columnIndex}>
-                                {rows[columnIndex][rowIndex] || ""} {/* Используйте пустую строку, если значение не существует */}
+                                {rows[columnIndex][rowIndex] || ""} {}
                             </td>
                         ))}
                     </tr>

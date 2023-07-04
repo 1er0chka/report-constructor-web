@@ -7,25 +7,72 @@ import AddColumnButton from "./Buttons/AddColumnButton";
 import Table from "./Table/Table";
 
 const Constructor = () => {
-    const [tableNames, setTableNames] = useState([]);
-    const [tableColumns, setTableColumns] = useState({});
+    const [allChoosingTables, setAllChoosingTables] = useState({}); // названия таблиц, которые есть в итоговой таблице
+    const [tableNames, setTableNames] = useState([]); // названия таблиц, доступных для выбора
+    const [tableColumns, setTableColumns] = useState({}); // названия всех колонок выбранной таблицы
     const [selectedTable, setSelectedTable] = useState("");
-    const [isColumnsRelevant, setColumnsRelevant] = useState([true]);
+    const [isColumnsRelevant, setColumnsRelevant] = useState(true);
     const [selectedColumn, setSelectedColumn] = useState("");
     const [isAddButtonActive, setAddButtonActive] = useState(false);
-    const [tableColumnsValues, setTableColumnsValues] = useState({});
+    const [tableColumnsValues, setTableColumnsValues] = useState({}); // итоговая таблица
 
     useEffect(() => {
-        getTableNames();
+        getTable();
     }, []);
 
-    function getTableNames() {
+    function getTable() {
+        if (Object.keys(allChoosingTables).length === 0 && selectedColumn === "") {
+            getFirstColumn();
+        } else {
+            getMoreColumns();
+        }
+    }
+
+    function getFirstColumn() {
         fetch(`http://localhost:2006/report-create/`)
             .then(response => response.json())
             .then(data => {
                 console.log("GET request completed successfully");
                 console.log("Server response:", data);
                 setTableNames(data.tables);
+            })
+            .catch((error) => {
+                console.error("Error occurred during GET request:", error);
+            });
+    }
+
+    function getMoreColumns() {
+        let copy = {...allChoosingTables};
+        if (copy.hasOwnProperty(selectedTable)) {
+            copy[selectedTable].push(tableColumns[selectedColumn]);
+        } else {
+            copy[selectedTable] = [tableColumns[selectedColumn]];
+        }
+        const data = {
+            tables: copy
+        }
+        if (allChoosingTables.hasOwnProperty(selectedTable)) {
+            allChoosingTables[selectedTable].push(tableColumns[selectedColumn]);
+        } else {
+            allChoosingTables[selectedTable] = [tableColumns[selectedColumn]];
+        }
+        fetch(`http://localhost:2006/report-create/getTable/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data),
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (Object.keys(data).includes("error")) {
+                    throw new Error();
+                }
+                console.log("GET request completed successfully");
+                console.log("Server response:", data);
+                setTableNames(data.tables);
+                console.log(data.data);
+                setTableColumnsValues(data.data);
             })
             .catch((error) => {
                 console.error("Error occurred during GET request:", error);
@@ -42,11 +89,11 @@ const Constructor = () => {
                 setSelectedTable(tableName);
                 setColumnsRelevant(false);
                 setAddButtonActive(false);
-                //setTableColumnsValues({});
             })
             .catch((error) => {
                 console.error("Error occurred during GET request:", error);
             });
+        console.log(allChoosingTables);
     }
 
     function activateAddButton(selectedColumn) {
@@ -54,21 +101,6 @@ const Constructor = () => {
         setAddButtonActive(tableColumns[selectedColumn]);
     }
 
-    function addColumn() {
-        fetch(`http://localhost:2006/report-create/${selectedTable}/${tableColumns[selectedColumn]}`)
-            .then((response) => response.json())
-            .then((data) => {
-                console.log("GET request completed successfully");
-                console.log("Server response:", data);
-                setTableColumnsValues(prevTableColumnsValues => ({
-                    ...prevTableColumnsValues,
-                    [selectedColumn]: data.rows
-                }));
-            })
-            .catch((error) => {
-                console.error("Error occurred during GET request:", error);
-            });
-    }
     function getCurrentData() {
         const currentDate = new Date();
         const day = String(currentDate.getDate()).padStart(2, "0");
@@ -121,7 +153,7 @@ const Constructor = () => {
                     </div>
                     <div>
                         <div>
-                            <AddColumnButton isActive={isAddButtonActive} addColumn={addColumn}/>
+                            <AddColumnButton isActive={isAddButtonActive} addColumn={getTable}/>
                         </div>
                     </div>
                 </div>
